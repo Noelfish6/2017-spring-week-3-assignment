@@ -19,25 +19,51 @@ d3.queue()
 
 function dataLoaded(err,trips,stations){
 	//Create a crossfilter with trips
+	var cf = crossfilter(trips);
 
 	//Create a dimension on bike_nr
+	var tripsByNr = cf.dimension(function(d){return d.bike_nr});
 
 	//Create a dimension on time of the day 
 		//Hint: the API for crossfilter dimension requires an accessor function argument
 		//crossfilter.dimension(function(d){return ...})
 		//Within this accessor function, use Date.getHours() and Date.getMinutes() to convert a Date object to a time of the day
+	var tripsByTime = cf.dimension(function(d) { return d.startTime.getHours() + d.startTime.getMinutes()/60; });
 
 	//Using console.log, log out the answer to the following questions
 	//What % of trips take place between 5PM and 8PM?
+	tripsByTime.filter([17,20]);
+	var trips5to8pm = tripsByTime.top(Infinity).length;
+	tripsByTime.filter(null);
+
+	console.log(trips5to8pm, tripsByTime.top(Infinity).length);  
+// Question: trips5to8pm = tripsByTime.top(Infinity).length
+	console.log("There are "+ Math.round(trips5to8pm/tripsByTime.top(Infinity).length*100) +"% of trips take place between 5PM and 8PM")
 
 	//What % of trips take place before 9AM and after 5PM?
+	tripsByTime.filter([9,17]);
+	var trips9to5pm = tripsByTime.top(Infinity).length;
+	tripsByTime.filter(null);
+
+	console.log(trips9to5pm, tripsByTime.top(Infinity).length)
+	console.log("There are "+ (100 - Math.round(trips9to5pm/tripsByTime.top(Infinity).length*100)) +"% of trips take place before 9AM and after 5PM")
+// Question: why 100 shoud be put in ()?
+
 
 	//How many trips were taken with each unique bike_nr? Which bike has the highest number of trip count?
 		//This will require the use dimension.group
+	var tripsByUniqueBikeNr = tripsByNr.group();
+	console.log('There are ', tripsByUniqueBikeNr.top(Infinity).length, ' trips were taken with each unique bike number.');
+
+	console.log("The bike number,",d3.max(tripsByUniqueBikeNr.top(Infinity)).key, ",has the highest number of trip count", ", and it has", d3.max(tripsByUniqueBikeNr.top(Infinity)).value, "trips");
+
 
 	//How much travel time was logged on each unique bike_nr? Which bike has the highest travel time logged?
 		//This will require the use dimension.group, but with a different reduce function
-
+	var travelTimeByBikeNr = tripsByUniqueBikeNr.reduceSum(function(d){return d.duration;});
+    
+    console.log('There was', travelTimeByBikeNr.top(Infinity).length, "was logged on each unique bike number");
+    console.log(travelTimeByBikeNr.top(1)[0].key+' has the highest travel time logged.');
 }
 
 function parseTrips(d){

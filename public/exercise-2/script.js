@@ -25,7 +25,7 @@ function dataLoaded(err,trips,stations){
 	drawUserGender(tripsByGender.top(Infinity), plot3);
 }
 
-function drawTimeOfDay(arr,div){
+function drawTimeOfDay(arr,div,dimension){
 	//calculate w, h; append <svg> and <g> for plot area
 	var w = div.node().clientWidth - m.l - m.r,
 		h = div.node().clientHeight - m.t - m.b;
@@ -110,7 +110,11 @@ function drawTimeOfDay(arr,div){
 /*		Exercise 2 part 1:
 		With the selected range of the brush, update the crossfilter
 		and then update the userType and userGender pie charts
-*/	}
+
+*/	
+	dimension.filter(d3.event.selection.map(scaleX.invert));
+	drawUserType(dimension)
+}
 
 }
 
@@ -143,7 +147,22 @@ function drawUserType(arr,div){
 	//Draw
 /*	Exercise 2 part 2: this part of the code does not account for the update and exit sets
 	Refractor this code to account for the update and exit sets
-*/	var slices = plot
+*/	
+
+
+	var chartContainer = plot.selectAll('.pie-chart')
+		.data([1]);
+
+	chartContainer.enter().append('g')..attr('class', 'pie-chart')
+		.merge(chartContainer)
+		..attr('transform','translate('+w/2+','+h/2')' )
+
+
+
+
+
+
+var slices = plot
 		.append('g').attr('class','pie-chart')
 		.attr('transform','translate('+w/2+','+h/2+')')
 		.selectAll('.slice')
