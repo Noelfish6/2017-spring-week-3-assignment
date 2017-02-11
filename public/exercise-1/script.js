@@ -43,15 +43,17 @@ function dataLoaded(err,trips,stations){
 	//What % of trips take place before 9AM and after 5PM?
 	tripsByTime.filter([9,17]);
 	var trips9to5pm = tripsByTime.top(Infinity).length;
-	tripsByTime.filter(null);
+	
 
 	console.log(trips9to5pm, tripsByTime.top(Infinity).length)
-	console.log("There are "+ (100 - Math.round(trips9to5pm/tripsByTime.top(Infinity).length*100)) +"% of trips take place before 9AM and after 5PM")
+	console.log("There are "+ (100 - Math.round(trips9to5pm/tripsByTime.top(Infinity).length*100)) +"% of trips take place before 9AM and after 5PM");
+
 // Question: why 100 shoud be put in ()?
 
 
 	//How many trips were taken with each unique bike_nr? Which bike has the highest number of trip count?
 		//This will require the use dimension.group
+	tripsByTime.filter(null);
 	var tripsByUniqueBikeNr = tripsByNr.group();
 	console.log('There are ', tripsByUniqueBikeNr.top(Infinity).length, ' trips were taken with each unique bike number.');
 
